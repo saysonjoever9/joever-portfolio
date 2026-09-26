@@ -21,18 +21,121 @@ html = r'''<!DOCTYPE html>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{
-  font-family:Inter,system-ui,sans-serif;color:var(--text);background:
-  radial-gradient(circle at 15% 10%,rgba(97,218,251,.13),transparent 28%),
-  radial-gradient(circle at 85% 25%,rgba(139,92,246,.14),transparent 30%),
-  var(--bg);
-  overflow-x:hidden;
+  font-family:Inter,system-ui,sans-serif;color:var(--text);background:var(--bg);
+  overflow-x:hidden;position:relative;
 }
-body:before{
-  content:"";position:fixed;inset:0;pointer-events:none;opacity:.14;
-  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
-                   linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
-  background-size:55px 55px;mask-image:linear-gradient(to bottom,#000,transparent 85%);
+
+/* ============ ANIMATED BACKGROUND LAYERS ============ */
+
+/* Canvas particle network */
+#particleCanvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55;
 }
+
+/* Animated gradient orbs */
+.bg-orbs{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.orb{
+  position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;
+  will-change:transform;
+}
+.orb1{
+  width:520px;height:520px;background:radial-gradient(circle,#61dafb,transparent 70%);
+  top:-160px;left:-120px;animation:orbFloat1 22s ease-in-out infinite;
+}
+.orb2{
+  width:600px;height:600px;background:radial-gradient(circle,#8b5cf6,transparent 70%);
+  top:20%;right:-200px;animation:orbFloat2 28s ease-in-out infinite;
+}
+.orb3{
+  width:450px;height:450px;background:radial-gradient(circle,#22d3ee,transparent 70%);
+  bottom:-150px;left:30%;animation:orbFloat3 25s ease-in-out infinite;
+}
+.orb4{
+  width:380px;height:380px;background:radial-gradient(circle,#4ade80,transparent 70%);
+  top:60%;left:-100px;opacity:.2;animation:orbFloat2 32s ease-in-out infinite reverse;
+}
+@keyframes orbFloat1{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(120px,80px) scale(1.1)}
+  66%{transform:translate(60px,160px) scale(.95)}
+}
+@keyframes orbFloat2{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(-140px,100px) scale(1.08)}
+  66%{transform:translate(-80px,-60px) scale(.92)}
+}
+@keyframes orbFloat3{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(100px,-120px) scale(1.15)}
+}
+
+/* Grid pattern with subtle pulse */
+.grid-overlay{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(97,218,251,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(97,218,251,.05) 1px,transparent 1px);
+  background-size:55px 55px;
+  mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 75%);
+  animation:gridPulse 8s ease-in-out infinite;
+}
+@keyframes gridPulse{
+  0%,100%{opacity:.6}
+  50%{opacity:1}
+}
+
+/* Circuit traces overlay */
+.circuit-overlay{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.08;
+  background-image:
+    radial-gradient(circle at 20% 30%,rgba(97,218,251,.6) 1px,transparent 2px),
+    radial-gradient(circle at 80% 70%,rgba(139,92,246,.6) 1px,transparent 2px),
+    radial-gradient(circle at 40% 80%,rgba(34,211,238,.6) 1px,transparent 2px),
+    radial-gradient(circle at 60% 20%,rgba(74,222,128,.6) 1px,transparent 2px);
+  background-size:400px 400px;
+  animation:circuitDrift 40s linear infinite;
+}
+@keyframes circuitDrift{
+  from{background-position:0 0}
+  to{background-position:400px 400px}
+}
+
+/* Twinkling stars */
+.stars{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+}
+.star{
+  position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;
+  animation:twinkle 3s ease-in-out infinite;
+}
+@keyframes twinkle{
+  0%,100%{opacity:.2;transform:scale(.8)}
+  50%{opacity:1;transform:scale(1.4)}
+}
+
+/* Shooting star */
+.shooting-star{
+  position:fixed;width:120px;height:2px;z-index:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#61dafb,transparent);
+  filter:drop-shadow(0 0 6px #61dafb);
+  opacity:0;animation:shoot 8s linear infinite;
+}
+.shooting-star:nth-child(1){top:15%;left:-200px;animation-delay:2s}
+.shooting-star:nth-child(2){top:45%;left:-200px;animation-delay:6s}
+.shooting-star:nth-child(3){top:75%;left:-200px;animation-delay:11s}
+@keyframes shoot{
+  0%{opacity:0;transform:translateX(0) rotate(-15deg)}
+  5%{opacity:1}
+  15%{opacity:1;transform:translateX(120vw) rotate(-15deg)}
+  16%,100%{opacity:0}
+}
+
+/* Content sits above background */
+nav, main, footer, .ai, .ai-panel{position:relative;z-index:1}
+
 a{color:inherit;text-decoration:none}
 .container{width:min(1120px,92%);margin:auto}
 nav{
@@ -81,7 +184,8 @@ h1{font-family:"Space Grotesk";font-size:clamp(3rem,7vw,6.5rem);line-height:.92;
 .btn:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(97,218,251,.12)}
 .hero-card{
   min-height:460px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(18,30,49,.88),rgba(9,14,25,.7));
-  border-radius:30px;box-shadow:var(--shadow);position:relative;overflow:hidden;display:grid;place-items:center
+  border-radius:30px;box-shadow:var(--shadow);position:relative;overflow:hidden;display:grid;place-items:center;
+  transition:transform .3s ease-out;will-change:transform;
 }
 .hero-card:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,rgba(97,218,251,.06),transparent 60%);pointer-events:none}
 .orbit{width:260px;height:260px;border:1px solid rgba(97,218,251,.3);border-radius:50%;position:relative;animation:spin 16s linear infinite}
@@ -209,6 +313,7 @@ footer i{color:var(--accent);margin-right:5px}
  .orbit{width:200px;height:200px}
  .core{inset:55px}
  .core span{font-size:2rem}
+ .orb{filter:blur(60px);opacity:.25}
 }
 @media(max-width:520px){
  .skills{grid-template-columns:1fr}
@@ -216,10 +321,32 @@ footer i{color:var(--accent);margin-right:5px}
  .nav-inner{height:64px}
  .logo{font-size:1.2rem}
  .logo-icon{width:32px;height:32px;font-size:1rem}
+ #particleCanvas{opacity:.35}
+}
+
+/* Accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce){
+  *,*:before,*:after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+  #particleCanvas,.shooting-star{display:none}
 }
 </style>
 </head>
 <body>
+
+<!-- ============ ANIMATED BACKGROUND ============ -->
+<canvas id="particleCanvas"></canvas>
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="orb orb4"></div>
+</div>
+<div class="grid-overlay"></div>
+<div class="circuit-overlay"></div>
+<div class="stars" id="stars"></div>
+<div class="shooting-star"></div>
+<div class="shooting-star"></div>
+<div class="shooting-star"></div>
 
 <nav>
   <div class="container nav-inner">
@@ -257,7 +384,7 @@ footer i{color:var(--accent);margin-right:5px}
         <a class="btn" href="#research"><i class="fas fa-book-open"></i>View Research</a>
       </div>
     </div>
-    <div class="hero-card reveal">
+    <div class="hero-card reveal" id="heroCard">
       <div class="orbit2"></div>
       <div class="orbit">
         <div class="core">
@@ -493,11 +620,129 @@ footer i{color:var(--accent);margin-right:5px}
 </div>
 
 <script>
+/* ============ BACKGROUND: STAR FIELD ============ */
+(function(){
+  const stars = document.getElementById('stars');
+  const count = 60;
+  let html = '';
+  for(let i=0;i<count;i++){
+    const x = Math.random()*100;
+    const y = Math.random()*100;
+    const delay = (Math.random()*3).toFixed(2);
+    const size = (Math.random()*1.5+0.5).toFixed(1);
+    html += '<div class="star" style="left:'+x+'%;top:'+y+'%;animation-delay:'+delay+'s;width:'+size+'px;height:'+size+'px"></div>';
+  }
+  stars.innerHTML = html;
+})();
+
+/* ============ BACKGROUND: PARTICLE NETWORK CANVAS ============ */
+(function(){
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  const PARTICLE_COUNT = 55;
+  const MAX_DIST = 140;
+  const COLORS = ['#61dafb','#8b5cf6','#22d3ee','#4ade80'];
+
+  function resize(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initParticles(){
+    particles = [];
+    for(let i=0;i<PARTICLE_COUNT;i++){
+      particles.push({
+        x: Math.random()*W,
+        y: Math.random()*H,
+        vx: (Math.random()-0.5)*0.35,
+        vy: (Math.random()-0.5)*0.35,
+        r: Math.random()*1.6+0.6,
+        c: COLORS[Math.floor(Math.random()*COLORS.length)]
+      });
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // Draw connections
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const a = particles[i], b = particles[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < MAX_DIST){
+          const alpha = (1 - dist/MAX_DIST) * 0.35;
+          ctx.strokeStyle = 'rgba(97,218,251,' + alpha + ')';
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw particles
+    for(const p of particles){
+      p.x += p.vx;
+      p.y += p.vy;
+
+      // Wrap around edges
+      if(p.x < 0) p.x = W;
+      if(p.x > W) p.x = 0;
+      if(p.y < 0) p.y = H;
+      if(p.y > H) p.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.c;
+      ctx.shadowColor = p.c;
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  // Respect reduced motion preference
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    resize();
+    initParticles();
+    draw();
+    window.addEventListener('resize', ()=>{ resize(); initParticles(); });
+  } else {
+    canvas.style.display = 'none';
+  }
+})();
+
+/* ============ HERO CARD PARALLAX ============ */
+(function(){
+  const heroCard = document.getElementById('heroCard');
+  if(!heroCard) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const heroSection = document.querySelector('.hero');
+  heroSection.addEventListener('mousemove', function(e){
+    const rect = heroSection.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    heroCard.style.transform = 'perspective(1000px) rotateY(' + (x*8) + 'deg) rotateX(' + (-y*8) + 'deg) translateZ(10px)';
+  });
+  heroSection.addEventListener('mouseleave', function(){
+    heroCard.style.transform = '';
+  });
+})();
+
+/* ============ SCROLL REVEAL ============ */
 const observer = new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})
 },{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
+/* ============ AI CHATBOT ============ */
 function toggleAI(){document.getElementById('aiPanel').classList.toggle('show')}
 
 function askAI(){
